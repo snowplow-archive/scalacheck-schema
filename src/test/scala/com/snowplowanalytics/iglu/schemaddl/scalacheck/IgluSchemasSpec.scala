@@ -35,7 +35,9 @@ class IgluSchemasSpec extends Specification with ScalaCheck { def is = s2"""
     implicit val arb: Arbitrary[JValue] = Arbitrary(gen)
     prop { (json: JValue) =>
       IgluSchemas.validate(json, schema) match {
-        case Right(_) => true
+        case Right(s) =>
+          println(prettyJson(s))
+          true
         case Left(error) =>
           println(s"Failed for schema:\n${prettyJson(json)}\nReason:\n $error")
           false

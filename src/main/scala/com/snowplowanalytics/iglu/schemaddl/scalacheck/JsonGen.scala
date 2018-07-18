@@ -19,6 +19,11 @@ import org.json4s.JsonAST._
 /** Schema-less JSON generators */
 object JsonGen {
 
+  /** Restricted set of keys for Object-generator in order to repeat same key in multiple instances */
+  val jsonObjectKeys = List("one", "type", "property", "geo", "position", "currency", "кирилица",
+  "foo", "with space", "camelCase", "PascalCase", "snake_case", "random", "key", "0", "o", "data",
+  "schema", "name", "vendor", "privateIp", "version", "region")
+
   def json: Gen[JValue] =
     for { result <- Gen.frequency((100, primitive), (10, jsonObject), (5, array)) } yield result
 
@@ -40,7 +45,7 @@ object JsonGen {
 
   /** List of JSON keys pairs (values are primitive) */
   def fields: Gen[List[(String, JValue)]] =
-    Gen.listOf(Gen.alphaNumStr.flatMap(k => primitive.map { (k, _) }))
+    Gen.listOf(Gen.oneOf(jsonObjectKeys).flatMap(k => primitive.map { (k, _) }))
 
   def jsonObject: Gen[JValue] =
     fields.map(JObject.apply)

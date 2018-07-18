@@ -15,17 +15,14 @@ libraryDependencies += "com.snowplowanalytics" %% "scalacheck-schema" % "0.1.0"
 ## Usage
 
 ```scala
-import org.json4s.jackson.parseJsonOpt
+import org.json4s.jackson.parseJson
 import com.snowplowanalytics.iglu.schemaddl.jsonschema.Schema
 import com.snowplowanalytics.iglu.schemaddl.jsonschema.json4s.Json4sToSchema._
 import com.snowplowanalytics.iglu.schemaddl.scalacheck.JsonSchemaGen
 
-for {
-  schemaJson <- parseJsonOpt("""{"type": ["integer", "string"], "maxLength": 10}""")
-  schemaObjectbject <- Schema.parse(json)
-  gen = schemaObject.map(JsonSchemaGen.json)
-  json <- gen.sample
-} yield json
+val schemaJson = parseJson("""{"type": ["integer", "string"], "maxLength": 10}""")
+val schemaObject: Schema = Schema.parse(schemaJson).getOrElse(throw new RuntimeException("Invalid JSON Schema"))
+val jsonGen: Gen[JValue] = JsonSchemaGen.json(schemaObject)
 ```
 
 Or you can fetch existing Schema from Iglu Registry:
