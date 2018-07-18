@@ -1,9 +1,11 @@
 lazy val root = project.in(file("."))
   .settings(
-    name := "scalacheck-schemaddl",
+    name := "scalacheck-schema",
     version := "0.1.0-rc1",
     organization := "com.snowplowanalytics",
-    scalaVersion := "2.11.12"
+    description := "ScalaCheck generators for various Iglu-compatible Schema formats",
+    scalaVersion := "2.11.12",
+    crossScalaVersions := Seq("2.11.12", "2.12.6")
   )
   .settings(BuildSettings.buildSettings)
   .settings(BuildSettings.scalifySettings)

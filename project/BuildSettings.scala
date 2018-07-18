@@ -15,6 +15,10 @@
 import sbt._
 import Keys._
 
+// Bintray plugin
+import bintray.BintrayPlugin._
+import bintray.BintrayKeys._
+
 /**
  * Common settings-patterns for Snowplow apps and libaries.
  * To enable any of these you need to explicitly add Settings value to build.sbt
@@ -59,6 +63,28 @@ object BuildSettings {
       "-target", "1.8",
       "-Xlint"
     )
+  )
+
+  lazy val publishSettings = bintraySettings ++ Seq(
+    publishMavenStyle := true,
+    publishArtifact := true,
+    publishArtifact in Test := false,
+    licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0.html")),
+    bintrayOrganization := Some("snowplow"),
+    bintrayRepository := "snowplow-maven",
+    pomIncludeRepository := { _ => false },
+    homepage := Some(url("http://snowplowanalytics.com")),
+    scmInfo := Some(ScmInfo(url("https://github.com/snowplow-incubator/scalacheck-schema"),
+      "git@github.com:snowplow/scala-weather.git")),
+    pomExtra := (
+      <developers>
+        <developer>
+          <name>Snowplow Analytics Ltd</name>
+          <email>support@snowplowanalytics.com</email>
+          <organization>Snowplow Analytics Ltd</organization>
+          <organizationUrl>http://snowplowanalytics.com</organizationUrl>
+        </developer>
+      </developers>)
   )
 
   lazy val helpersSettings = Seq[Setting[_]](
