@@ -40,7 +40,7 @@ object BuildSettings {
       "-Ywarn-unused",
       "-Ywarn-value-discard",
       "-Ypartial-unification",
-      "language:higherKinds"
+      "-language:higherKinds"
     ),
     javacOptions := Seq(
       "-source", "1.8",
