@@ -13,13 +13,10 @@
 package com.snowplowanalytics.iglu.schemaddl.scalacheck
 
 import cats.syntax.either._
-
 import com.snowplowanalytics.iglu.core.SchemaKey
-
-import org.json4s.JsonAST.JValue
+import org.json4s.JsonAST.{JDouble, JValue}
 import org.json4s.jackson.prettyJson
-
-import org.scalacheck.{Gen, Arbitrary}
+import org.scalacheck.{Arbitrary, Gen}
 import org.specs2.{ScalaCheck, Specification}
 
 /** Integration test suite */
@@ -35,9 +32,7 @@ class IgluSchemasSpec extends Specification with ScalaCheck { def is = s2"""
     implicit val arb: Arbitrary[JValue] = Arbitrary(gen)
     prop { (json: JValue) =>
       IgluSchemas.validate(json, schema) match {
-        case Right(s) =>
-          println(prettyJson(s))
-          true
+        case Right(s) => true
         case Left(error) =>
           println(s"Failed for schema:\n${prettyJson(json)}\nReason:\n $error")
           false
