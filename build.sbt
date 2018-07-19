@@ -5,7 +5,8 @@ lazy val root = project.in(file("."))
     organization := "com.snowplowanalytics",
     description := "ScalaCheck generators for various Iglu-compatible Schema formats",
     scalaVersion := "2.11.12",
-    crossScalaVersions := Seq("2.11.12", "2.12.6")
+    crossScalaVersions := Seq("2.11.12", "2.12.6"),
+    licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0"))
   )
   .settings(BuildSettings.buildSettings)
   .settings(
