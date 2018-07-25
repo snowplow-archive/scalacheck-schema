@@ -25,7 +25,18 @@ object JsonGen {
   "schema", "name", "vendor", "privateIp", "version", "region")
 
   def json: Gen[JValue] =
-    for { result <- Gen.frequency((100, primitive), (10, jsonObject), (5, array)) } yield result
+    for {
+      depth <- Gen.chooseNum(0, 4)
+      value <- json(depth)
+    } yield value
+
+
+  def json(maxDepth: Int): Gen[JValue] =
+    for {
+      varyDepth <- Gen.chooseNum(0, maxDepth)
+      jsonGen <- if (varyDepth == 0) primitive else Gen.frequency((3, primitive), (2, jsonObject(maxDepth - 1)), (1, array(maxDepth - 1)))
+      result <- jsonGen
+    } yield result
 
   def bool: Gen[JBool] =
     Gen.oneOf(JBool(true), JBool(false))
@@ -47,10 +58,19 @@ object JsonGen {
   def fields: Gen[List[(String, JValue)]] =
     Gen.listOf(Gen.oneOf(jsonObjectKeys).flatMap(k => primitive.map { (k, _) }))
 
+  /** List of JSON keys pairs with specified depth for non-primitive types */
+  def fields(depth: Int): Gen[List[(String, JValue)]] =
+    Gen.listOf(Gen.oneOf(jsonObjectKeys).flatMap(k => json(depth).map { (k, _) }))
+
   def jsonObject: Gen[JValue] =
     fields.map(JObject.apply)
+
+  def jsonObject(depth: Int): Gen[JValue] =
+    fields(depth).map(JObject.apply)
 
   def array: Gen[JArray] =
     Gen.listOf(Gen.oneOf(primitive, jsonObject)).map(JArray.apply)
 
+  def array(depth: Int): Gen[JArray] =
+    Gen.listOf(json(depth)).map(JArray.apply)
 }

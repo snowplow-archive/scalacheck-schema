@@ -27,6 +27,8 @@ class JsonGenSpec extends Specification with ScalaCheck { def is = s2"""
   jsonObject builds valid with required keys $e3
   json builds valid JSON from enum $e4
   json builds valid JSON for oneOf even without properties $e5
+  json builds values with specified depth e6
+  test depth function $e7
   """
 
   def e1 = {
@@ -134,5 +136,44 @@ class JsonGenSpec extends Specification with ScalaCheck { def is = s2"""
       Arbitrary(JsonGenSchema.json(input))
 
     prop(check)
+  }
+
+  def e6 = {
+    val gen = JsonGen.json(6)
+
+    implicit val arb: Arbitrary[JValue] = Arbitrary(gen)
+
+    val check: JValue => Boolean = {
+      case j =>
+        val d = JsonGenSpec.depth(0)(j)
+        println(s"wo! ${d}")
+        true
+    }
+
+    prop(check)
+  }
+
+  def e7 = {
+    val d = JsonGenSpec.depth(0)(_)
+    val d0 = parseJson("1")
+    val d1 = parseJson("""{"foo": "1"}""")
+    val d2 = parseJson("""{"foo": {"bar": 1}}""")
+    val d3 = parseJson("""{"foo": {"bar": {"bar": 1}}}""")
+
+    (d(d0) must beEqualTo(0)) and (d(d1) must beEqualTo(1)) and (d(d2) must beEqualTo(2)) and (d(d3) must beEqualTo(3))
+  }
+}
+
+object JsonGenSpec {
+  def safeMax(default: Int)(list: List[Int]): Int =
+    try { list.max } catch { case _: UnsupportedOperationException => default }
+
+  def depth(i: Int)(json: JValue): Int = {
+    val go = depth(i + 1)(_)
+    json match {
+      case JObject(fields) => safeMax(i) { fields.map(_._2).map(go) }
+      case JArray(items) => safeMax(i) { items.map(go) }
+      case _ => i
+    }
   }
 }
