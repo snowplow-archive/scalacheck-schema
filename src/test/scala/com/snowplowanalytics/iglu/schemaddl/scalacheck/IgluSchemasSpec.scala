@@ -14,7 +14,7 @@ package com.snowplowanalytics.iglu.schemaddl.scalacheck
 
 import cats.syntax.either._
 import com.snowplowanalytics.iglu.core.SchemaKey
-import org.json4s.JsonAST.{JDouble, JValue}
+import org.json4s.JsonAST.JValue
 import org.json4s.jackson.prettyJson
 import org.scalacheck.{Arbitrary, Gen}
 import org.specs2.{ScalaCheck, Specification}

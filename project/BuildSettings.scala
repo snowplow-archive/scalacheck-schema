@@ -59,7 +59,7 @@ object BuildSettings {
     pomIncludeRepository := { _ => false },
     homepage := Some(url("http://snowplowanalytics.com")),
     scmInfo := Some(ScmInfo(url("https://github.com/snowplow-incubator/scalacheck-schema"),
-      "git@github.com:snowplow/scala-weather.git")),
+      "git@github.com:snowplow-incubator/scalacheck-schema.git")),
     pomExtra := (
       <developers>
         <developer>
