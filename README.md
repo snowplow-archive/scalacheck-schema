@@ -18,28 +18,31 @@ libraryDependencies += "com.snowplowanalytics" %% "scalacheck-schema" % "0.1.0"
 import org.json4s.jackson.parseJson
 import com.snowplowanalytics.iglu.schemaddl.jsonschema.Schema
 import com.snowplowanalytics.iglu.schemaddl.jsonschema.json4s.Json4sToSchema._
-import com.snowplowanalytics.iglu.schemaddl.scalacheck.JsonSchemaGen
+import com.snowplowanalytics.iglu.schemaddl.scalacheck.JsonGenSchema
 
 val schemaJson = parseJson("""{"type": ["integer", "string"], "maxLength": 10}""")
 val schemaObject: Schema = Schema.parse(schemaJson).getOrElse(throw new RuntimeException("Invalid JSON Schema"))
-val jsonGen: Gen[JValue] = JsonSchemaGen.json(schemaObject)
+val jsonGen: Gen[JValue] = JsonGenSchema.json(schemaObject)
 ```
 
 Or you can fetch existing Schema from Iglu Registry:
 
 ```scala
 import com.snowplowanalytics.iglu.client.Resolver
-import com.snowplowanalytics.iglu.schemaddl.scalacheck.{ IgluSchemas, JsonSchemaGen }
+import com.snowplowanalytics.iglu.core.{SchemaKey, SchemaVer}
+import com.snowplowanalytics.iglu.schemaddl.scalacheck.{IgluSchemas, JsonGenSchema}
 
 val resolver: Option[Resolver] = ???    // Can be some custom resolver or none for Iglu Central
 
 for {
+  schemaKey <- SchemaKey("com.snowplowanalytics.snowplow", "geolocation_context", "jsonschema", SchemaVer(1, 1, 0))
+    .asRight[String]
   // Get schema from Iglu Central
-  schemaJson <- IgluSchemas.lookup(None)("iglu:com.snowplowanalytics.snowplow/geolocation_context/jsonschema/1-1-0")
+  schemaJson <- IgluSchemas.lookup(None)(schemaKey)
   // Parse as JSON Schema AST
   schemaObject <- IgluSchemas.parseSchema(schemaJson)
   // Create JSON generateor
-  gen = schemaObject.map(JsonSchemaGen.json)
+  gen = schemaObject.map(JsonGenSchema.json)
   // Generate JSON instance compatible with specified schema
   json = gen.sample
 } yield json
