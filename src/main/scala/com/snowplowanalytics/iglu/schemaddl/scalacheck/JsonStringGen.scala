@@ -18,30 +18,30 @@ import java.util.Locale
 
 import cats._
 import cats.implicits._
-import com.snowplowanalytics.iglu.schemaddl.jsonschema._
+import com.snowplowanalytics.iglu.schemaddl.jsonschema.properties._
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.cats.implicits._
 
 /** String generators for JSON Schema formats */
 object JsonStringGen {
 
-  def forFormat(format: StringProperties.Format): Gen[String] = {
+  def forFormat(format: StringProperty.Format): Gen[String] = {
     format match {
-      case StringProperties.UriFormat => uriGen
-      case StringProperties.Ipv4Format => ipv4Gen
-      case StringProperties.Ipv6Format => ipv6Gen
-      case StringProperties.EmailFormat => emailGen
-      case StringProperties.HostNameFormat => hostnameGen
-      case StringProperties.UuidFormat => Gen.uuid.map(_.toString)
-      case StringProperties.CustomFormat(_) => Arbitrary.arbitrary[String]
-      case StringProperties.DateTimeFormat =>
+      case StringProperty.Format.UriFormat => uriGen
+      case StringProperty.Format.Ipv4Format => ipv4Gen
+      case StringProperty.Format.Ipv6Format => ipv6Gen
+      case StringProperty.Format.EmailFormat => emailGen
+      case StringProperty.Format.HostNameFormat => hostnameGen
+      case StringProperty.Format.UuidFormat => Gen.uuid.map(_.toString)
+      case StringProperty.Format.CustomFormat(_) => Arbitrary.arbitrary[String]
+      case StringProperty.Format.DateTimeFormat =>
         val format = DateTimeFormatter
           .ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
           .withZone(ZoneOffset.UTC)
         Gen.calendar.suchThat(_.getWeekYear < 10000).map { c =>
           format.format(Instant.ofEpochMilli(c.getTimeInMillis))
         }
-      case StringProperties.DateFormat =>
+      case StringProperty.Format.DateFormat =>
         val format = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         Gen.calendar.map(c => format.format(Instant.ofEpochMilli(c.getTimeInMillis)))
     }
