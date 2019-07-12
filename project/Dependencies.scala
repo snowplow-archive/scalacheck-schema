@@ -16,7 +16,7 @@ object Dependencies {
 
   object V {
     // Scala
-    val igluClient       = "0.5.0"
+    val igluClient       = "0.6.0-M6"
     val schemaDdl        = "0.6.0"
     val scalaCheck       = "1.14.0"
     val scalaCheckCats   = "0.1.0"

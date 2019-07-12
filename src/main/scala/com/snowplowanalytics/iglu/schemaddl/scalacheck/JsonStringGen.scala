@@ -12,15 +12,15 @@
  */
 package com.snowplowanalytics.iglu.schemaddl.scalacheck
 
-import org.scalacheck.{Arbitrary, Gen}
-import org.scalacheck.cats.implicits._
-import cats._
-import cats.implicits._
 import java.time.{Instant, ZoneOffset}
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+import cats._
+import cats.implicits._
 import com.snowplowanalytics.iglu.schemaddl.jsonschema._
+import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.cats.implicits._
 
 /** String generators for JSON Schema formats */
 object JsonStringGen {
