@@ -12,14 +12,11 @@
  */
 package com.snowplowanalytics.iglu.schemaddl.scalacheck
 
+import cats.implicits._
+import com.snowplowanalytics.iglu.schemaddl.jsonschema._
+import org.json4s.JsonAST._
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.cats.implicits._
-
-import cats.implicits._
-
-import org.json4s.JsonAST._
-
-import com.snowplowanalytics.iglu.schemaddl.jsonschema._
 
 import Utils.traverseMap
 import JsonStringGen._

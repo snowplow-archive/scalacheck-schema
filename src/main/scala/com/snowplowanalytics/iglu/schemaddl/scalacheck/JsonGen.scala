@@ -12,9 +12,8 @@
  */
 package com.snowplowanalytics.iglu.schemaddl.scalacheck
 
-import org.scalacheck.{Arbitrary, Gen}
-
 import org.json4s.JsonAST._
+import org.scalacheck.{Arbitrary, Gen}
 
 /** Schema-less JSON generators */
 object JsonGen {
@@ -25,7 +24,7 @@ object JsonGen {
   "schema", "name", "vendor", "privateIp", "version", "region")
 
   def json: Gen[JValue] =
-    for { 
+    for {
       depth <- Gen.chooseNum(0, 2)
       value <- json(depth)
     } yield value
