@@ -12,10 +12,9 @@
  */
 package com.snowplowanalytics.iglu.schemaddl.scalacheck
 
+import cats.implicits._
 import org.scalacheck.Gen
 import org.scalacheck.cats.implicits._
-
-import cats.implicits._
 
 object Utils {
   def traverseMap[K, S, O](hashMap: Map[K, S])(f: S => Gen[O]): Gen[List[(K, O)]] =
