@@ -12,7 +12,7 @@
  */
 package com.snowplowanalytics.iglu.schemaddl.scalacheck
 
-import org.json4s.JsonAST._
+import io.circe.Json
 import org.scalacheck.{Arbitrary, Gen}
 
 /** Schema-less JSON generators */
@@ -23,53 +23,52 @@ object JsonGen {
   "foo", "with space", "camelCase", "PascalCase", "snake_case", "random", "key", "0", "o", "data",
   "schema", "name", "vendor", "privateIp", "version", "region")
 
-  def json: Gen[JValue] =
+  def json: Gen[Json] =
     for {
       depth <- Gen.chooseNum(0, 2)
       value <- json(depth)
     } yield value
 
 
-  def json(maxDepth: Int): Gen[JValue] =
+  def json(maxDepth: Int): Gen[Json] =
     for {
       varyDepth <- Gen.chooseNum(0, maxDepth)
       jsonGen <- if (varyDepth == 0) primitive else Gen.frequency((10, primitive), (2, jsonObject(maxDepth - 1)), (1, array(maxDepth - 1)))
-      result <- jsonGen
-    } yield result
+    } yield jsonGen
 
-  def bool: Gen[JBool] =
-    Gen.oneOf(JBool(true), JBool(false))
+  def bool: Gen[Json] =
+    Gen.oneOf(Json.True, Json.False)
 
-  def jsonNull: Gen[JValue] =
-    Gen.const(JNull)
+  def jsonNull: Gen[Json] =
+    Gen.const(Json.Null)
 
-  def string: Gen[JString] =
-    Gen.alphaNumStr.map(JString.apply)
+  def string: Gen[Json] =
+    Gen.alphaNumStr.map(Json.fromString)
 
-  def int: Gen[JInt] =
-    Arbitrary.arbBigInt.arbitrary.map(JInt.apply)
+  def int: Gen[Json] =
+    Arbitrary.arbBigInt.arbitrary.map(Json.fromBigInt)
 
   /** Any JSON value except object and array */
-  def primitive: Gen[JValue] =
+  def primitive: Gen[Json] =
     Gen.oneOf(string, int, bool, jsonNull)
 
   /** List of JSON keys pairs (values are primitive) */
-  def fields: Gen[List[(String, JValue)]] =
+  def fields: Gen[List[(String, Json)]] =
     Gen.listOf(Gen.oneOf(jsonObjectKeys).flatMap(k => primitive.map { (k, _) }))
 
   /** List of JSON keys pairs with specified depth for non-primitive types */
-  def fields(depth: Int): Gen[List[(String, JValue)]] =
+  def fields(depth: Int): Gen[List[(String, Json)]] =
     Gen.listOf(Gen.oneOf(jsonObjectKeys).flatMap(k => json(depth).map { (k, _) }))
 
-  def jsonObject: Gen[JValue] =
-    fields.map(JObject.apply)
+  def jsonObject: Gen[Json] =
+    fields.map(Json.fromFields)
 
-  def jsonObject(depth: Int): Gen[JValue] =
-    fields(depth).map(JObject.apply)
+  def jsonObject(depth: Int): Gen[Json] =
+    fields(depth).map(Json.fromFields)
 
-  def array: Gen[JArray] =
-    Gen.listOf(Gen.oneOf(primitive, jsonObject)).map(JArray.apply)
+  def array: Gen[Json] =
+    Gen.listOf(Gen.oneOf(primitive, jsonObject)).map(Json.arr)
 
-  def array(depth: Int): Gen[JArray] =
-    Gen.listOf(json(depth)).map(JArray.apply)
+  def array(depth: Int): Gen[Json] =
+    Gen.listOf(json(depth)).map(Json.arr)
 }

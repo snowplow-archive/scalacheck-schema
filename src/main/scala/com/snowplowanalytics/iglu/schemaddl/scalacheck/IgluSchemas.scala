@@ -15,14 +15,14 @@ package com.snowplowanalytics.iglu.schemaddl.scalacheck
 import cats.Monad
 import cats.effect.Clock
 import cats.implicits._
-import com.snowplowanalytics.iglu.core.SchemaKey
-import com.snowplowanalytics.iglu.schemaddl.jsonschema.Schema
-import com.snowplowanalytics.iglu.schemaddl.jsonschema.json4s.Json4sToSchema._
-import io.circe.Json
 import com.snowplowanalytics.iglu.client.Client
 import com.snowplowanalytics.iglu.client.validator.CirceValidator
 import com.snowplowanalytics.iglu.client.resolver.{InitListCache, InitSchemaCache, Resolver}
 import com.snowplowanalytics.iglu.client.resolver.registries.RegistryLookup
+import com.snowplowanalytics.iglu.core.SchemaKey
+import com.snowplowanalytics.iglu.schemaddl.jsonschema.Schema
+import com.snowplowanalytics.iglu.schemaddl.jsonschema.circe.implicits._
+import io.circe.Json
 
 object IgluSchemas {
   def parseSchema(json: Json): Either[String, Schema] =
