@@ -12,46 +12,35 @@
  */
 package com.snowplowanalytics.iglu.schemaddl.scalacheck
 
+import cats.Monad
+import cats.effect.Clock
 import cats.implicits._
-
+import com.snowplowanalytics.iglu.core.SchemaKey
 import com.snowplowanalytics.iglu.schemaddl.jsonschema.Schema
 import com.snowplowanalytics.iglu.schemaddl.jsonschema.json4s.Json4sToSchema._
-
-import org.json4s.jackson.JsonMethods.fromJsonNode
-
-import com.snowplowanalytics.iglu.client.{Bootstrap, Resolver}
-import com.snowplowanalytics.iglu.client.repositories._
-import com.snowplowanalytics.iglu.client.validation.ValidatableJValue.validateAgainstSchema
-
-import com.snowplowanalytics.iglu.core.SchemaKey
-
-import org.json4s.JsonAST.JValue
+import io.circe.Json
+import com.snowplowanalytics.iglu.client.Client
+import com.snowplowanalytics.iglu.client.validator.CirceValidator
+import com.snowplowanalytics.iglu.client.resolver.{InitListCache, InitSchemaCache, Resolver}
+import com.snowplowanalytics.iglu.client.resolver.registries.RegistryLookup
 
 object IgluSchemas {
-  val IgluCentral = HttpRepositoryRef(
-    RepositoryRefConfig("Iglu Central", 1, List("com.snowplowanalytics")),
-    "http://iglucentral.com", None
-  )
-
-  val repositoryRefs: List[RepositoryRef] = List(Bootstrap.Repo, IgluCentral)
-
-  val IgluResolver = Resolver(100, repositoryRefs: _*)
-
-  def parseSchema(json: JValue): Either[String, Schema] =
+  def parseSchema(json: Json): Either[String, Schema] =
     Schema
       .parse(json)
       .fold("Fetched JSON cannot be parsed into a Schema".asLeft[Schema])(_.asRight[String])
 
   /** Validate instance against schema */
-  def validate(instance: JValue, schema: JValue): Either[String, JValue] =
-    validateAgainstSchema(instance, schema)(IgluResolver)   // Resolver is not used
-      .leftMap(_.list.mkString(", "))
-      .toEither
+  def validate(instance: Json, schema: Json): Either[String, Json] =
+    CirceValidator.validate(instance, schema)
+      .leftMap(_.toClientError.getMessage)
+      .as(instance)
 
-  def lookup(resolver: Option[Resolver])(schemaKey: SchemaKey): Either[String, JValue] =
-    resolver.fold(IgluResolver)(r => r)
-      .lookupSchema(schemaKey.toSchemaUri)
-      .leftMap(_.list.mkString(", "))
-      .map(fromJsonNode)
-      .toEither
+  def lookup[F[_]: Monad: InitSchemaCache: InitListCache: RegistryLookup: Clock](
+    resolver: Resolver[F],
+    schemaKey: SchemaKey
+  ): F[Either[String, Json]] =
+    resolver
+      .lookupSchema(schemaKey, 10)
+      .map(_.leftMap(_.getMessage))
 }
