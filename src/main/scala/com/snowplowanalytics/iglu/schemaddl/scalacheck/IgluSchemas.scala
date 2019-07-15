@@ -41,6 +41,6 @@ object IgluSchemas {
     schemaKey: SchemaKey
   ): F[Either[String, Json]] =
     resolver
-      .lookupSchema(schemaKey, 10)
+      .lookupSchema(schemaKey)
       .map(_.leftMap(_.getMessage))
 }
