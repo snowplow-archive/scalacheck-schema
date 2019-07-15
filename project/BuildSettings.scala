@@ -24,31 +24,6 @@ import bintray.BintrayKeys._
  * To enable any of these you need to explicitly add Settings value to build.sbt
  */
 object BuildSettings {
-
-  lazy val buildSettings = Seq[Setting[_]](
-    scalacOptions := Seq(
-      "-deprecation",
-      "-encoding", "UTF-8",
-      "-feature",
-      "-unchecked",
-      "-Ywarn-dead-code",
-      "-Ywarn-inaccessible",
-      "-Ywarn-infer-any",
-      "-Ywarn-nullary-override",
-      "-Ywarn-nullary-unit",
-      "-Ywarn-numeric-widen",
-      "-Ywarn-unused",
-      "-Ywarn-value-discard",
-      "-Ypartial-unification",
-      "-language:higherKinds"
-    ),
-    javacOptions := Seq(
-      "-source", "1.8",
-      "-target", "1.8",
-      "-Xlint"
-    )
-  )
-
   lazy val publishSettings = bintraySettings ++ Seq(
     publishMavenStyle := true,
     publishArtifact := true,

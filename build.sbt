@@ -7,7 +7,6 @@ lazy val root = project.in(file("."))
     scalaVersion := "2.12.10",
     licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0"))
   )
-  .settings(BuildSettings.buildSettings)
   .settings(BuildSettings.publishSettings)
   .settings(
     resolvers ++= Seq(
