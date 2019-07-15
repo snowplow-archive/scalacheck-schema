@@ -18,9 +18,9 @@ object Dependencies {
     // Scala
     val igluClient       = "1.0.2"
     val schemaDdl        = "0.12.0"
+    val circe            = "0.13.0"
     val scalaCheck       = "1.14.0"
     val scalaCheckCats   = "0.1.0"
-    val json4sJackson    = "3.2.11"
     // Scala (test only)
     val validator        = "1.6"
     val specs2           = "4.3.2"
@@ -28,8 +28,8 @@ object Dependencies {
 
   // Scala
   val igluClient       = "com.snowplowanalytics"      %% "iglu-scala-client"         % V.igluClient
+  val circeLiteral     = "io.circe"                   %% "circe-literal"             % V.circe
   val schemaDdl        = "com.snowplowanalytics"      %% "schema-ddl"                % V.schemaDdl
-  val json4sJackson    = "org.json4s"                 %% "json4s-jackson"            % V.json4sJackson
   val scalaCheck       = "org.scalacheck"             %% "scalacheck"                % V.scalaCheck
   val scalaCheckCats   = "io.chrisdavenport"          %% "cats-scalacheck"           % V.scalaCheckCats
   // Scala (test only)
