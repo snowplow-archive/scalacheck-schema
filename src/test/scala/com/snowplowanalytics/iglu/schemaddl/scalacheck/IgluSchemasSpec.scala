@@ -12,10 +12,13 @@
  */
 package com.snowplowanalytics.iglu.schemaddl.scalacheck
 
+import cats.data.EitherT
+import cats.effect.{Clock, IO}
 import cats.syntax.either._
+import com.snowplowanalytics.iglu.client.resolver.Resolver
+import com.snowplowanalytics.iglu.client.resolver.registries.Registry
 import com.snowplowanalytics.iglu.core.SchemaKey
-import org.json4s.JsonAST.{JDouble, JValue}
-import org.json4s.jackson.prettyJson
+import io.circe.{Json, Printer}
 import org.scalacheck.{Arbitrary, Gen}
 import org.specs2.{ScalaCheck, Specification}
 
@@ -29,13 +32,13 @@ class IgluSchemasSpec extends Specification with ScalaCheck { def is = s2"""
 
   def run(uri: String) = {
     val (gen, schema) = IgluSchemasSpec.fetch(uri)
-    implicit val arb: Arbitrary[JValue] = Arbitrary(gen)
-    prop { (json: JValue) =>
+    implicit val arb: Arbitrary[Json] = Arbitrary(gen)
+    prop { (json: Json) =>
       IgluSchemas.validate(json, schema) match {
         case Right(s) =>
           true
         case Left(error) =>
-          println(s"Failed for schema:\n${prettyJson(json)}\nReason:\n $error")
+          println(s"Failed for schema:\n${json.pretty(Printer.spaces2)}\nReason:\n $error")
           false
       }
     }
@@ -43,16 +46,19 @@ class IgluSchemasSpec extends Specification with ScalaCheck { def is = s2"""
 }
 
 object IgluSchemasSpec {
-  def fetch(uri: String): (Gen[JValue], JValue) = {
+  implicit val timer = IO.timer(scala.concurrent.ExecutionContext.Implicits.global)
+
+  def fetch(uri: String): (Gen[Json], Json) = {
     val schemaKey = SchemaKey
       .fromUri(uri)
       .getOrElse(throw new RuntimeException("Invalid Iglu URI"))
 
-    val result = for {
-      s <- IgluSchemas.lookup(None)(schemaKey)
-      a <- IgluSchemas.parseSchema(s)
+    val result: EitherT[IO, String, (Gen[Json], Json)] = for {
+      r <- EitherT.right(Resolver.init[IO](0, Registry.IgluCentral))
+      s <- EitherT(IgluSchemas.lookup[IO](r, schemaKey))
+      a <- EitherT.fromEither[IO](IgluSchemas.parseSchema(s))
     } yield (JsonGenSchema.json(a), s)
 
-    result.fold(e => throw new RuntimeException(e), x => x)
+    result.value.unsafeRunSync().fold(e => throw new RuntimeException(e), identity)
   }
 }

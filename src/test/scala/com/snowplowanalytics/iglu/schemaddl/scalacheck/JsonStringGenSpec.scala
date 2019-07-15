@@ -14,7 +14,6 @@
 package com.snowplowanalytics.iglu.schemaddl.scalacheck
 
 import org.apache.commons.validator.routines.{DomainValidator, EmailValidator, InetAddressValidator, UrlValidator}
-
 import org.specs2.{ScalaCheck, Specification}
 
 class JsonStringGenSpec extends Specification with ScalaCheck { def is = s2"""
