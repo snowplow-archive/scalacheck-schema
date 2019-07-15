@@ -15,7 +15,6 @@ package com.snowplowanalytics.iglu.schemaddl.scalacheck
 import cats.Monad
 import cats.effect.Clock
 import cats.implicits._
-import com.snowplowanalytics.iglu.client.Client
 import com.snowplowanalytics.iglu.client.validator.CirceValidator
 import com.snowplowanalytics.iglu.client.resolver.{InitListCache, InitSchemaCache, Resolver}
 import com.snowplowanalytics.iglu.client.resolver.registries.RegistryLookup
