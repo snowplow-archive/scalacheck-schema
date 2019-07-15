@@ -13,8 +13,7 @@
 package com.snowplowanalytics.iglu.schemaddl.scalacheck
 
 import cats.data.EitherT
-import cats.effect.{Clock, IO}
-import cats.syntax.either._
+import cats.effect.IO
 import com.snowplowanalytics.iglu.client.resolver.Resolver
 import com.snowplowanalytics.iglu.client.resolver.registries.Registry
 import com.snowplowanalytics.iglu.core.SchemaKey
@@ -35,7 +34,7 @@ class IgluSchemasSpec extends Specification with ScalaCheck { def is = s2"""
     implicit val arb: Arbitrary[Json] = Arbitrary(gen)
     prop { (json: Json) =>
       IgluSchemas.validate(json, schema) match {
-        case Right(s) =>
+        case Right(_) =>
           true
         case Left(error) =>
           println(s"Failed for schema:\n${json.printWith(Printer.spaces2)}\nReason:\n $error")
