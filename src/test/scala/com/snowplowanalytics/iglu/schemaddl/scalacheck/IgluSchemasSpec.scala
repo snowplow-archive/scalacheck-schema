@@ -54,7 +54,7 @@ object IgluSchemasSpec {
       .getOrElse(throw new RuntimeException("Invalid Iglu URI"))
 
     val result: EitherT[IO, String, (Gen[Json], Json)] = for {
-      r <- EitherT.right(Resolver.init[IO](0, Registry.IgluCentral))
+      r <- EitherT.right(Resolver.init[IO](0, None, Registry.IgluCentral))
       s <- EitherT(IgluSchemas.lookup[IO](r, schemaKey))
       a <- EitherT.fromEither[IO](IgluSchemas.parseSchema(s))
     } yield (JsonGenSchema.json(a), s)
