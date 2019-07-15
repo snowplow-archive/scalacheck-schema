@@ -14,7 +14,6 @@ package com.snowplowanalytics.iglu.schemaddl.scalacheck
 
 import java.time.{Instant, ZoneOffset}
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 import cats._
 import cats.implicits._
