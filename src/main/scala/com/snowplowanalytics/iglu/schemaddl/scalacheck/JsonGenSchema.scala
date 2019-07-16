@@ -61,7 +61,7 @@ object JsonGenSchema {
       case _ =>
         Gen.chooseNum(minimum, maximum)
     }
-    result.map(x => Json.fromBigInt(BigInt(x)))
+    result.map(x => Json.fromLong(x))
   }
 
   import Gen.Choose._
