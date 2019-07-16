@@ -12,6 +12,8 @@
  */
 package com.snowplowanalytics.iglu.schemaddl.scalacheck
 
+import java.net.URI
+
 import cats.data.EitherT
 import cats.effect.IO
 import com.snowplowanalytics.iglu.client.resolver.Resolver
@@ -53,7 +55,13 @@ object IgluSchemasSpec {
       .getOrElse(throw new RuntimeException("Invalid Iglu URI"))
 
     val result: EitherT[IO, String, (Gen[Json], Json)] = for {
-      r <- EitherT.right(Resolver.init[IO](0, None, Registry.IgluCentral))
+      r <- EitherT.right(Resolver.init[IO](0, None,
+        Registry.IgluCentral,
+        Registry.Http(
+          Registry.Config("mirror", 1, List("com.snowplowanalytics")),
+          Registry.HttpConnection(new URI("http://mirror01.iglucentral.com"), None)
+        )
+      ))
       s <- EitherT(IgluSchemas.lookup[IO](r, schemaKey))
       a <- EitherT.fromEither[IO](IgluSchemas.parseSchema(s))
     } yield (JsonGenSchema.json(a), s)
