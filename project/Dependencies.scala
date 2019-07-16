@@ -23,7 +23,7 @@ object Dependencies {
     val scalaCheckCats   = "0.1.0"
     // Scala (test only)
     val validator        = "1.6"
-    val specs2           = "4.3.2"
+    val specs2           = "4.8.1"
   }
 
   // Scala
