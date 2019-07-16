@@ -1,3 +1,21 @@
+Version 0.2.0 (2019-xx-xx)
+--------------------------
+Fix readme example (#10)
+Bump iglu-scala-client to 0.6.0 (#12)
+[WIP] Bump schema-ddl to 0.10.0 (#13)
+Move to circe (#5)
+Bump Scala to 2.12 (#9)
+Use sbt-tpolecat (#14)
+Specify trusty distribution in travis (#16)
+Add Iglu Central mirror (#17)
+Bump specs2 to 4.8.1 (#18)
+Bump SBT to 1.3.4 (#19)
+Extend copyright to 2019 (#20)
+Bump scalacheck to 1.14.2 (#21)
+Bump cats-scalacheck to 0.2.0 (#22)
+Use https version of Sonatype OSS Snapshots (#23)
+Add scalafmt init conf (#24)
+
 Version 0.1.0 (2018-08-10)
 --------------------------
 Initial release
