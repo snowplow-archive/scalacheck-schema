@@ -1,7 +1,7 @@
 lazy val root = project.in(file("."))
   .settings(
     name := "scalacheck-schema",
-    version := "0.1.0",
+    version := "0.2.0",
     organization := "com.snowplowanalytics",
     description := "ScalaCheck generators for various Iglu-compatible Schema formats",
     scalaVersion := "2.12.8",

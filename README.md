@@ -4,48 +4,44 @@ ScalaCheck generators for various Iglu-compatible schema formats.
 
 ## Installation
 
-The latest version of ScalaCheck Schema is 0.1.0, which is cross-built against Scala 2.11.x and 2.12.x.
+The latest version of ScalaCheck Schema is 0.2.0, which is built against Scala 2.12.x.
 
 If you're using SBT, add the following lines to your build file:
 
 ```scala
-libraryDependencies += "com.snowplowanalytics" %% "scalacheck-schema" % "0.1.0"
+libraryDependencies += "com.snowplowanalytics" %% "scalacheck-schema" % "0.2.0"
 ```
 
 ## Usage
 
 ```scala
-import org.json4s.jackson.parseJson
 import com.snowplowanalytics.iglu.schemaddl.jsonschema.Schema
-import com.snowplowanalytics.iglu.schemaddl.jsonschema.json4s.Json4sToSchema._
+import com.snowplowanalytics.iglu.schemaddl.jsonschema.circe.implicits._
 import com.snowplowanalytics.iglu.schemaddl.scalacheck.JsonGenSchema
+import io.circe.literal._
 
-val schemaJson = parseJson("""{"type": ["integer", "string"], "maxLength": 10}""")
+val schemaJson: Json = json"""{"type": ["integer", "string"], "maxLength": 10}"""
 val schemaObject: Schema = Schema.parse(schemaJson).getOrElse(throw new RuntimeException("Invalid JSON Schema"))
-val jsonGen: Gen[JValue] = JsonGenSchema.json(schemaObject)
+val jsonGen: Gen[Json] = JsonGenSchema.json(schemaObject)
 ```
 
-Or you can fetch existing Schema from Iglu Registry:
+Or you can generate jsons from an existing Schema in an Iglu Registry:
 
 ```scala
-import com.snowplowanalytics.iglu.client.Resolver
+import com.snowplowanalytics.iglu.client.resolver.Resolver
 import com.snowplowanalytics.iglu.core.{SchemaKey, SchemaVer}
 import com.snowplowanalytics.iglu.schemaddl.scalacheck.{IgluSchemas, JsonGenSchema}
 
-val resolver: Option[Resolver] = ???    // Can be some custom resolver or none for Iglu Central
-
-for {
-  schemaKey <- SchemaKey("com.snowplowanalytics.snowplow", "geolocation_context", "jsonschema", SchemaVer(1, 1, 0))
-    .asRight[String]
-  // Get schema from Iglu Central
-  schemaJson <- IgluSchemas.lookup(None)(schemaKey)
-  // Parse as JSON Schema AST
-  schemaObject <- IgluSchemas.parseSchema(schemaJson)
-  // Create JSON generateor
-  gen = schemaObject.map(JsonGenSchema.json)
-  // Generate JSON instance compatible with specified schema
-  json = gen.sample
-} yield json
+val jsonGen: EitherT[IO, String, Gen[Json]] = for {
+  // define a resolver using Iglu Central as registry
+  r <- EitherT.right(Resolver.init[IO](0, None, Registry.IgluCentral))
+  // schema we want to generate jsons from
+  schemaKey = SchemaKey("com.snowplowanalytics.snowplow", "geolocation_context", "jsonschema", SchemaVer(1, 1, 0))
+  // get the schema from Iglu Central
+  schemaJson <- EitherT(IgluSchemas.lookup[IO](r, schemaKey))
+  // parse as JSON Schema AST
+  schemaObject <- EitherT.fromEither(IgluSchemas.parseSchema(schemaJson))
+} yield JsonGenSchema.json(schemaObject)
 ```
 
 ## Copyright and License

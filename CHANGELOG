@@ -1,3 +1,17 @@
+Version 0.2.0 (2019-xx-xx)
+--------------------------
+Bump Scala to 2.12 (#9)
+Move to circe (#5)
+Add Iglu Central mirror (#17)
+Bump schema-ddl to 0.10.0 (#13)
+Bump iglu-scala-client to 0.6.0 (#12)
+Bump specs2 to 4.6.0 (#18)
+Bump SBT to 1.2.8 (#19)
+Use sbt-tpolecat (#14)
+Specify trusty distribution in travis (#16)
+Fix readme example (#10)
+Extend copyright to 2019 (#20)
+
 Version 0.1.0 (2018-08-10)
 --------------------------
 Initial release
