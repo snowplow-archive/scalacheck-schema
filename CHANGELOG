@@ -1,3 +1,22 @@
+Version 0.2.0 (2021-03-10)
+--------------------------
+Migrate to Sonatype and Github Actions (#25)
+Add scalafmt init conf (#24)
+Use https version of Sonatype OSS Snapshots (#23)
+Bump cats-scalacheck to 0.3.0 (#22)
+Bump scalacheck to 1.15.3 (#21)
+Extend copyright to 2019 (#20)
+Bump sbt to 1.4.8 (#19)
+Bump specs2 to 4.10.6 (#18)
+Add Iglu Central mirror (#17)
+Specify trusty distribution in travis (#16)
+Use sbt-tpolecat (#14)
+Bump Scala to 2.12 (#9)
+Move to circe (#5)
+Bump schema-ddl to 0.12.0 (#13)
+Bump iglu-scala-client to 1.0.2 (#12)
+Fix readme example (#10)
+
 Version 0.1.0 (2018-08-10)
 --------------------------
 Initial release
