@@ -6,6 +6,7 @@ jdk:
 - oraclejdk8
 script:
 - sbt test
+- sbt scalafmtCheckAll scalafmtSbtCheck
 deploy:
   skip_cleanup: true
   provider: script

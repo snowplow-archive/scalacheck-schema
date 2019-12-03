@@ -16,7 +16,11 @@ import cats.Monad
 import cats.effect.Clock
 import cats.implicits._
 import com.snowplowanalytics.iglu.client.validator.CirceValidator
-import com.snowplowanalytics.iglu.client.resolver.{InitListCache, InitSchemaCache, Resolver}
+import com.snowplowanalytics.iglu.client.resolver.{
+  InitListCache,
+  InitSchemaCache,
+  Resolver
+}
 import com.snowplowanalytics.iglu.client.resolver.registries.RegistryLookup
 import com.snowplowanalytics.iglu.core.SchemaKey
 import com.snowplowanalytics.iglu.schemaddl.jsonschema.Schema
@@ -27,11 +31,14 @@ object IgluSchemas {
   def parseSchema(json: Json): Either[String, Schema] =
     Schema
       .parse(json)
-      .fold("Fetched JSON cannot be parsed into a Schema".asLeft[Schema])(_.asRight[String])
+      .fold("Fetched JSON cannot be parsed into a Schema".asLeft[Schema])(
+        _.asRight[String]
+      )
 
   /** Validate instance against schema */
   def validate(instance: Json, schema: Json): Either[String, Json] =
-    CirceValidator.validate(instance, schema)
+    CirceValidator
+      .validate(instance, schema)
       .leftMap(_.toClientError.getMessage)
       .as(instance)
 
