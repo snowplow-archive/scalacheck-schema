@@ -19,7 +19,7 @@ object Dependencies {
     val igluClient       = "0.6.0"
     val circe            = "0.12.3"
     val schemaDdl        = "0.10.0-M8"
-    val scalaCheck       = "1.14.0"
+    val scalaCheck       = "1.14.2"
     val scalaCheckCats   = "0.1.0"
     // Scala (test only)
     val validator        = "1.6"
