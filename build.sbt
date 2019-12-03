@@ -11,7 +11,7 @@ lazy val root = project.in(file("."))
   .settings(
     resolvers ++= Seq(
       "Snowplow bintray" at "https://snowplow.bintray.com/snowplow-maven",
-      "Sonatype OSS Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
+      "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
     ),
     libraryDependencies ++= Seq(
       Dependencies.igluClient,
