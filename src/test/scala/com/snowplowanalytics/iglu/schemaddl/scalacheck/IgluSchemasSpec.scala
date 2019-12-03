@@ -24,22 +24,34 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.specs2.{ScalaCheck, Specification}
 
 /** Integration test suite */
-class IgluSchemasSpec extends Specification with ScalaCheck { def is = s2"""
-  com.snowplowanalytics.snowplow/geolocation_context/jsonschema/1-1-0 ${run("iglu:com.snowplowanalytics.snowplow/geolocation_context/jsonschema/1-1-0")}
-  com.snowplowanalytics.snowplow/anon_ip/jsonschema/1-0-0 ${run("iglu:com.snowplowanalytics.snowplow/anon_ip/jsonschema/1-0-0")}
-  com.getvero/delivered/jsonschema/1-0-0 ${run("iglu:com.getvero/delivered/jsonschema/1-0-0")}
-  com.snowplowanalytics.snowplow.enrichments/pii_enrichment_config/jsonschema/2-0-0 ${skipped("Does not merge oneOf into primary Schema")}
+class IgluSchemasSpec extends Specification with ScalaCheck {
+  def is =
+    s2"""
+  com.snowplowanalytics.snowplow/geolocation_context/jsonschema/1-1-0 ${run(
+      "iglu:com.snowplowanalytics.snowplow/geolocation_context/jsonschema/1-1-0"
+    )}
+  com.snowplowanalytics.snowplow/anon_ip/jsonschema/1-0-0 ${run(
+      "iglu:com.snowplowanalytics.snowplow/anon_ip/jsonschema/1-0-0"
+    )}
+  com.getvero/delivered/jsonschema/1-0-0 ${run(
+      "iglu:com.getvero/delivered/jsonschema/1-0-0"
+    )}
+  com.snowplowanalytics.snowplow.enrichments/pii_enrichment_config/jsonschema/2-0-0 ${skipped(
+      "Does not merge oneOf into primary Schema"
+    )}
   """
 
   def run(uri: String) = {
-    val (gen, schema) = IgluSchemasSpec.fetch(uri)
+    val (gen, schema)                 = IgluSchemasSpec.fetch(uri)
     implicit val arb: Arbitrary[Json] = Arbitrary(gen)
     prop { (json: Json) =>
       IgluSchemas.validate(json, schema) match {
         case Right(_) =>
           true
         case Left(error) =>
-          println(s"Failed for schema:\n${json.printWith(Printer.spaces2)}\nReason:\n $error")
+          println(
+            s"Failed for schema:\n${json.printWith(Printer.spaces2)}\nReason:\n $error"
+          )
           false
       }
     }
@@ -47,7 +59,8 @@ class IgluSchemasSpec extends Specification with ScalaCheck { def is = s2"""
 }
 
 object IgluSchemasSpec {
-  implicit val timer = IO.timer(scala.concurrent.ExecutionContext.Implicits.global)
+  implicit val timer =
+    IO.timer(scala.concurrent.ExecutionContext.Implicits.global)
 
   def fetch(uri: String): (Gen[Json], Json) = {
     val schemaKey = SchemaKey
@@ -55,17 +68,25 @@ object IgluSchemasSpec {
       .getOrElse(throw new RuntimeException("Invalid Iglu URI"))
 
     val result: EitherT[IO, String, (Gen[Json], Json)] = for {
-      r <- EitherT.right(Resolver.init[IO](0, None,
-        Registry.IgluCentral,
-        Registry.Http(
-          Registry.Config("mirror", 1, List("com.snowplowanalytics")),
-          Registry.HttpConnection(new URI("http://mirror01.iglucentral.com"), None)
+      r <- EitherT.right(
+        Resolver.init[IO](
+          0,
+          None,
+          Registry.IgluCentral,
+          Registry.Http(
+            Registry.Config("mirror", 1, List("com.snowplowanalytics")),
+            Registry
+              .HttpConnection(new URI("http://mirror01.iglucentral.com"), None)
+          )
         )
-      ))
+      )
       s <- EitherT(IgluSchemas.lookup[IO](r, schemaKey))
       a <- EitherT.fromEither[IO](IgluSchemas.parseSchema(s))
     } yield (JsonGenSchema.json(a), s)
 
-    result.value.unsafeRunSync().fold(e => throw new RuntimeException(e), identity)
+    result
+      .value
+      .unsafeRunSync()
+      .fold(e => throw new RuntimeException(e), identity)
   }
 }

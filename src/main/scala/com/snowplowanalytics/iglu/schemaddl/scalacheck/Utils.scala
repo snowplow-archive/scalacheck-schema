@@ -17,8 +17,11 @@ import org.scalacheck.Gen
 import org.scalacheck.cats.implicits._
 
 object Utils {
-  def traverseMap[K, S, O](hashMap: Map[K, S])(f: S => Gen[O]): Gen[List[(K, O)]] =
-    hashMap.map { case (k, v) => f(v).map { (k, _) } }
+  def traverseMap[K, S, O](
+    hashMap: Map[K, S]
+  )(f: S => Gen[O]): Gen[List[(K, O)]] =
+    hashMap
+      .map { case (k, v) => f(v).map { (k, _) } }
       .toList
       .sequence[Gen, (K, O)]
 }

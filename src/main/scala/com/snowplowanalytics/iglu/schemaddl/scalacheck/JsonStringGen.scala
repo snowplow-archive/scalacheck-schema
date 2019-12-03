@@ -24,14 +24,14 @@ import org.scalacheck.cats.implicits._
 /** String generators for JSON Schema formats */
 object JsonStringGen {
 
-  def forFormat(format: StringProperty.Format): Gen[String] = {
+  def forFormat(format: StringProperty.Format): Gen[String] =
     format match {
-      case StringProperty.Format.UriFormat => uriGen
-      case StringProperty.Format.Ipv4Format => ipv4Gen
-      case StringProperty.Format.Ipv6Format => ipv6Gen
-      case StringProperty.Format.EmailFormat => emailGen
-      case StringProperty.Format.HostNameFormat => hostnameGen
-      case StringProperty.Format.UuidFormat => Gen.uuid.map(_.toString)
+      case StringProperty.Format.UriFormat       => uriGen
+      case StringProperty.Format.Ipv4Format      => ipv4Gen
+      case StringProperty.Format.Ipv6Format      => ipv6Gen
+      case StringProperty.Format.EmailFormat     => emailGen
+      case StringProperty.Format.HostNameFormat  => hostnameGen
+      case StringProperty.Format.UuidFormat      => Gen.uuid.map(_.toString)
       case StringProperty.Format.CustomFormat(_) => Arbitrary.arbitrary[String]
       case StringProperty.Format.DateTimeFormat =>
         val format = DateTimeFormatter
@@ -42,17 +42,39 @@ object JsonStringGen {
         }
       case StringProperty.Format.DateFormat =>
         val format = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        Gen.calendar.map(c => format.format(Instant.ofEpochMilli(c.getTimeInMillis)))
+        Gen
+          .calendar
+          .map(c => format.format(Instant.ofEpochMilli(c.getTimeInMillis)))
     }
-  }
 
   def hostnameGen: Gen[String] = {
-    val toplevelDomains = List("com", "org", "edu", "gov", "ru", "nl", "co.uk", "me", "us",
-      "name", "biz", "online", "pro", "tel")
+    val toplevelDomains = List(
+      "com",
+      "org",
+      "edu",
+      "gov",
+      "ru",
+      "nl",
+      "co.uk",
+      "me",
+      "us",
+      "name",
+      "biz",
+      "online",
+      "pro",
+      "tel"
+    )
     for {
-      n     <- Gen.frequency((10, Gen.const(1)), (3, Gen.const(2)), (2, Gen.const(3)))
-      label <- Gen.listOfN(n, Gen.alphaNumStr.suchThat(s => s.length < 63 && s.length > 2))
-      top   <- Gen.oneOf(toplevelDomains)
+      n <- Gen.frequency(
+        (10, Gen.const(1)),
+        (3, Gen.const(2)),
+        (2, Gen.const(3))
+      )
+      label <- Gen.listOfN(
+        n,
+        Gen.alphaNumStr.suchThat(s => s.length < 63 && s.length > 2)
+      )
+      top <- Gen.oneOf(toplevelDomains)
     } yield (label :+ top).mkString(".")
   } :| "Hostname Generator"
 
@@ -70,31 +92,41 @@ object JsonStringGen {
     val queryParams = for {
       n         <- Gen.chooseNum(1, 10)
       maxLength <- Gen.chooseNum(3, 40)
-      item       = Gen.listOfN(maxLength, Gen.alphaNumChar).map(_.mkString)
-      pairs     <- Gen.listOfN(n * 2, item.map(x => (x, x)))
+      item = Gen.listOfN(maxLength, Gen.alphaNumChar).map(_.mkString)
+      pairs <- Gen.listOfN(n * 2, item.map(x => (x, x)))
     } yield "?" + pairs.map { case (k, v) => s"$k=$v" }.mkString("&")
 
     val queryPath = for {
       n         <- Gen.chooseNum(1, 10)
       maxLength <- Gen.chooseNum(3, 40)
-      item       = Gen.listOfN(maxLength, Gen.alphaNumChar).map(_.mkString)
-      pairs     <- Gen.listOfN(n, item)
-      endpoint  <- Gen.alphaNumStr
-      end       <- Gen.frequency((1, queryParams.map(qp => s"/$endpoint$qp").map(_.some)), (10, none[String]))
+      item = Gen.listOfN(maxLength, Gen.alphaNumChar).map(_.mkString)
+      pairs    <- Gen.listOfN(n, item)
+      endpoint <- Gen.alphaNumStr
+      end <- Gen.frequency(
+        (1, queryParams.map(qp => s"/$endpoint$qp").map(_.some)),
+        (10, none[String])
+      )
     } yield pairs.mkString("/") ++ end.getOrElse("")
 
     for {
-      scheme      <- Gen.oneOf(schemes)
-      user        <- Gen.oneOf(Gen.const(none[String]), Gen.alphaNumStr.suchThat(_.length > 3).map(u => s"$u@".some))
-      host        <- Gen.oneOf(hostnameGen, ipv4Gen)
-      portOrSlash <- Gen.oneOf(Gen.const("/"), Gen.chooseNum(2, 65535).map(p => s":$p/"))
-      path        <- Gen.oneOf(queryParams, queryPath)
+      scheme <- Gen.oneOf(schemes)
+      user <- Gen.oneOf(
+        Gen.const(none[String]),
+        Gen.alphaNumStr.suchThat(_.length > 3).map(u => s"$u@".some)
+      )
+      host <- Gen.oneOf(hostnameGen, ipv4Gen)
+      portOrSlash <- Gen.oneOf(
+        Gen.const("/"),
+        Gen.chooseNum(2, 65535).map(p => s":$p/")
+      )
+      path <- Gen.oneOf(queryParams, queryPath)
     } yield s"$scheme://${user.getOrElse("")}$host$portOrSlash$path"
   } :| "URI Generator"
 
   def ipv4Gen: Gen[String] = {
     val num = Gen.numChar.map(_.toString)
-    def range(min: Int, max: Int) = Gen.choose(min.toChar, max.toChar).map(_.toString)
+    def range(min: Int, max: Int) =
+      Gen.choose(min.toChar, max.toChar).map(_.toString)
     val genDecOctet = Gen.oneOf(
       num,
       range(49, 57) |+| num,
@@ -106,10 +138,10 @@ object JsonStringGen {
   } :| "IPv4 Generator"
 
   def ipv6Gen: Gen[String] = {
-    val h16 = timesBetween(min = 1, max = 4, genHexDigit.map(_.toString))
-    val ls32 = Gen.oneOf(h16 |+| Gen.const(":") |+| h16, ipv4Gen)
+    val h16      = timesBetween(min = 1, max = 4, genHexDigit.map(_.toString))
+    val ls32     = Gen.oneOf(h16 |+| Gen.const(":") |+| h16, ipv4Gen)
     val h16colon = h16 |+| Gen.const(":")
-    val :: = Gen.const("::")
+    val ::       = Gen.const("::")
 
     Gen.oneOf(
       times(6, h16colon) |+| ls32,
@@ -124,8 +156,11 @@ object JsonStringGen {
     )
   } :| "IPv6 Generator"
 
-  def genHexDigit: Gen[Char] = Gen.oneOf(
-    Seq('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'))
+  def genHexDigit: Gen[Char] =
+    Gen.oneOf(
+      Seq('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D',
+        'E', 'F')
+    )
 
   private def timesBetween[T: Monoid](min: Int, max: Int, g: Gen[T]): Gen[T] =
     for {
