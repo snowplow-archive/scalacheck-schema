@@ -20,7 +20,7 @@ object Dependencies {
     val circe            = "0.12.3"
     val schemaDdl        = "0.10.0-M8"
     val scalaCheck       = "1.14.2"
-    val scalaCheckCats   = "0.1.0"
+    val scalaCheckCats   = "0.2.0"
     // Scala (test only)
     val validator        = "1.6"
     val specs2           = "4.8.1"
