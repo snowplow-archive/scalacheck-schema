@@ -22,8 +22,9 @@ object Dependencies {
     val scalaCheck       = "1.15.3"
     val scalaCheckCats   = "0.3.0"
     // Scala (test only)
-    val validator        = "1.6"
-    val specs2           = "4.10.6"
+    val slf4j     = "1.7.30"
+    val validator = "1.6"
+    val specs2    = "4.10.6"
   }
 
   // Scala
@@ -33,7 +34,8 @@ object Dependencies {
   val scalaCheck       = "org.scalacheck"             %% "scalacheck"                % V.scalaCheck
   val scalaCheckCats   = "io.chrisdavenport"          %% "cats-scalacheck"           % V.scalaCheckCats
   // Scala (test only)
-  val validator        = "commons-validator"          %  "commons-validator"         % V.validator      % "test"
-  val specs2           = "org.specs2"                 %% "specs2-core"               % V.specs2         % "test"
-  val specs2ScalaCheck = "org.specs2"                 %% "specs2-scalacheck"         % V.specs2         % "test"
+  val logger           = "org.slf4j"         % "slf4j-simple"       % V.slf4j     % Test
+  val validator        = "commons-validator" % "commons-validator"  % V.validator % Test
+  val specs2           = "org.specs2"        %% "specs2-core"       % V.specs2    % Test
+  val specs2ScalaCheck = "org.specs2"        %% "specs2-scalacheck" % V.specs2    % Test
 }
