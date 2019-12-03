@@ -13,10 +13,16 @@
 
 package com.snowplowanalytics.iglu.schemaddl.scalacheck
 
-import org.apache.commons.validator.routines.{DomainValidator, EmailValidator, InetAddressValidator, UrlValidator}
+import org.apache.commons.validator.routines.{
+  DomainValidator,
+  EmailValidator,
+  InetAddressValidator,
+  UrlValidator
+}
 import org.specs2.{ScalaCheck, Specification}
 
-class JsonStringGenSpec extends Specification with ScalaCheck { def is = s2"""
+class JsonStringGenSpec extends Specification with ScalaCheck {
+  def is = s2"""
   hostnameGen generates valid host names $e1
   emailGen generates valid email addresses $e2
   ipv4Gen generates valid IP addresses $e3
@@ -25,17 +31,22 @@ class JsonStringGenSpec extends Specification with ScalaCheck { def is = s2"""
   """
 
   def e1 =
-    prop(DomainValidator.getInstance().isValid(_: String)).setGen(JsonStringGen.hostnameGen)
+    prop(DomainValidator.getInstance().isValid(_: String))
+      .setGen(JsonStringGen.hostnameGen)
 
   def e2 =
-    prop(EmailValidator.getInstance().isValid(_: String)).setGen(JsonStringGen.emailGen)
+    prop(EmailValidator.getInstance().isValid(_: String))
+      .setGen(JsonStringGen.emailGen)
 
   def e3 =
-    prop(InetAddressValidator.getInstance().isValid(_: String)).setGen(JsonStringGen.ipv4Gen)
+    prop(InetAddressValidator.getInstance().isValid(_: String))
+      .setGen(JsonStringGen.ipv4Gen)
 
   def e4 =
-    prop(UrlValidator.getInstance().isValid(_: String)).setGen(JsonStringGen.uriGen)
+    prop(UrlValidator.getInstance().isValid(_: String))
+      .setGen(JsonStringGen.uriGen)
 
   def e5 =
-    prop(InetAddressValidator.getInstance().isValid(_: String)).setGen(JsonStringGen.ipv6Gen)
+    prop(InetAddressValidator.getInstance().isValid(_: String))
+      .setGen(JsonStringGen.ipv6Gen)
 }

@@ -37,24 +37,32 @@ object JsonGenSchema {
   def string(schema: Schema): Gen[Json] = {
     val minLength = schema.minLength.map(_.value.toInt).getOrElse(0)
     val maxLength = schema.maxLength.map(_.value.toInt).getOrElse(128)
-    val sizedRandom = if (minLength == maxLength)
-      sizedStr(maxLength)
-    else
-      for { card <- Gen.chooseNum(minLength, maxLength); str <- sizedStr(card) } yield str
+    val sizedRandom =
+      if (minLength == maxLength)
+        sizedStr(maxLength)
+      else
+        for {
+          card <- Gen.chooseNum(minLength, maxLength); str <- sizedStr(card)
+        } yield str
 
-    schema.format
+    schema
+      .format
       .map(forFormat)
       .getOrElse(sizedRandom)
       .map(Json.fromString)
   }
 
   def sizedStr(size: Int) =
-    Gen.listOfN(size, Gen.alphaLowerChar.map(_.toByte)).map(bytes => new String(bytes.toArray))
+    Gen
+      .listOfN(size, Gen.alphaLowerChar.map(_.toByte))
+      .map(bytes => new String(bytes.toArray))
 
   /** Generate JSON integer from schema with supposed integer type */
   def int(schema: Schema): Gen[Json] = {
-    val minimum = schema.minimum.map(_.getAsDecimal.toLong).getOrElse(Long.MinValue)
-    val maximum = schema.maximum.map(_.getAsDecimal.toLong).getOrElse(Long.MaxValue)
+    val minimum =
+      schema.minimum.map(_.getAsDecimal.toLong).getOrElse(Long.MinValue)
+    val maximum =
+      schema.maximum.map(_.getAsDecimal.toLong).getOrElse(Long.MaxValue)
     val result = schema.multipleOf match {
       case Some(NumberProperty.MultipleOf.IntegerMultipleOf(value)) =>
         Gen.chooseNum(minimum, maximum).suchThat(_ % value == 0)
@@ -68,8 +76,10 @@ object JsonGenSchema {
   val ArbitraryBigDecimal = BigDecimal(100000)
 
   def number(schema: Schema): Gen[Json] = {
-    val minimum = schema.minimum.map(_.getAsDecimal).getOrElse(-ArbitraryBigDecimal)
-    val maximum = schema.maximum.map(_.getAsDecimal).getOrElse(ArbitraryBigDecimal)
+    val minimum =
+      schema.minimum.map(_.getAsDecimal).getOrElse(-ArbitraryBigDecimal)
+    val maximum =
+      schema.maximum.map(_.getAsDecimal).getOrElse(ArbitraryBigDecimal)
     val result = schema.multipleOf match {
       case Some(NumberProperty.MultipleOf.NumberMultipleOf(value)) =>
         Gen.chooseNum(minimum, maximum).suchThat(_ % value == 0)
@@ -94,20 +104,24 @@ object JsonGenSchema {
   /** Generate JSON object from schema with supposed object type */
   def jsonObject(schema: Schema): Gen[Json] = {
     val properties = getProperties(schema).getOrElse(Gen.const(List.empty))
-    val additionalProperties = getAdditionalProperties(schema).getOrElse(Gen.const(List.empty))
+    val additionalProperties =
+      getAdditionalProperties(schema).getOrElse(Gen.const(List.empty))
 
-    (additionalProperties, properties).mapN((a, b) => Json.fromFields((a ++ b).toMap.toList))
+    (additionalProperties, properties).mapN(
+      (a, b) => Json.fromFields((a ++ b).toMap.toList)
+    )
   }
 
   def fromType(schema: Schema): Option[Gen[Json]] =
     schema.`type`.map(typeToGen(_)(schema))
 
   def fromOneOf(schema: Schema): Option[Gen[Json]] =
-    schema.oneOf.map { schemas => for {
-      n <- Gen.chooseNum(0, schemas.value.length - 1)
-      result <- schemas.value.map(json).get(n.toLong).get
-    } yield result
-}
+    schema.oneOf.map { schemas =>
+      for {
+        n      <- Gen.chooseNum(0, schemas.value.length - 1)
+        result <- schemas.value.map(json).get(n.toLong).get
+      } yield result
+    }
 
   /** Pick some JSON from enum */
   def fromEnum(enum: CommonProperties.Enum): Gen[Json] =
@@ -119,52 +133,72 @@ object JsonGenSchema {
 
     val properties = schema.properties.map {
       case ObjectProperty.Properties(map) =>
-        val requiredFields = traverseMap(map.filterKeys(required.contains))(json)
-        val nonRequiredFields = traverseMap(map.filterKeys(!required.contains(_)))(json)
+        val requiredFields =
+          traverseMap(map.filterKeys(required.contains))(json)
+        val nonRequiredFields =
+          traverseMap(map.filterKeys(!required.contains(_)))(json)
 
         for {
           nonRequired <- nonRequiredFields
-          toFilter <- Gen.listOfN(nonRequired.length, Arbitrary.arbBool.arbitrary)
+          toFilter <- Gen
+            .listOfN(nonRequired.length, Arbitrary.arbBool.arbitrary)
           filtered = nonRequired.zip(toFilter).filter(_._2).map(_._1)
           required <- requiredFields
         } yield filtered ++ required
     }
 
     // In case Schema has only `required`, without `properties`
-    val requiredWithoutSchema = required.filter(key => !schema.properties.map(_.value).getOrElse(Map.empty).keySet.contains(key))
-    val requiredFields = requiredWithoutSchema.map(key => JsonGen.json.map { (key, _) }).sequence
+    val requiredWithoutSchema = required.filter(
+      key =>
+        !schema
+          .properties
+          .map(_.value)
+          .getOrElse(Map.empty)
+          .keySet
+          .contains(key)
+    )
+    val requiredFields =
+      requiredWithoutSchema.map(key => JsonGen.json.map { (key, _) }).sequence
 
     properties.orElse(Some(requiredFields))
   }
 
   /** Generate list of random additional properties if they're allowed */
-  def getAdditionalProperties(schema: Schema): Option[Gen[List[(String, Json)]]] = {
+  def getAdditionalProperties(
+    schema: Schema
+  ): Option[Gen[List[(String, Json)]]] =
     schema.additionalProperties.flatMap {
-      case ObjectProperty.AdditionalProperties.AdditionalPropertiesAllowed(true) =>
+      case ObjectProperty
+            .AdditionalProperties
+            .AdditionalPropertiesAllowed(true) =>
         JsonGen.fields.some
-      case ObjectProperty.AdditionalProperties.AdditionalPropertiesAllowed(false) =>
+      case ObjectProperty
+            .AdditionalProperties
+            .AdditionalPropertiesAllowed(false) =>
         none
-      case ObjectProperty.AdditionalProperties.AdditionalPropertiesSchema(schema) =>
-        Gen.listOf(Gen.nonEmptyBuildableOf[String, Char](Gen.alphaChar))
+      case ObjectProperty
+            .AdditionalProperties
+            .AdditionalPropertiesSchema(schema) =>
+        Gen
+          .listOf(Gen.nonEmptyBuildableOf[String, Char](Gen.alphaChar))
           .flatMap(key => traverseMap(key.map(kk => (kk, schema)).toMap)(json))
           .map(fields => fields)
           .some
     }
-  }
 
   def typeToGen(t: CommonProperties.Type)(schema: Schema): Gen[Json] =
     t match {
-      case CommonProperties.Type.Null => JsonGen.jsonNull
-      case CommonProperties.Type.Array => array(schema)
-      case CommonProperties.Type.String => string(schema)
+      case CommonProperties.Type.Null    => JsonGen.jsonNull
+      case CommonProperties.Type.Array   => array(schema)
+      case CommonProperties.Type.String  => string(schema)
       case CommonProperties.Type.Integer => int(schema)
-      case CommonProperties.Type.Number => number(schema)
+      case CommonProperties.Type.Number  => number(schema)
       case CommonProperties.Type.Boolean => JsonGen.bool
-      case CommonProperties.Type.Object => jsonObject(schema)
+      case CommonProperties.Type.Object  => jsonObject(schema)
       case CommonProperties.Type.Union(types) =>
         val schemas = types.map(typeToGen(_)(schema))
         for {
-          n <- Gen.chooseNum(0, schemas.size - 1)
+          n      <- Gen.chooseNum(0, schemas.size - 1)
           schema <- schemas.toList.apply(n)
         } yield schema
     }

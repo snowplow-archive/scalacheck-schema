@@ -1,17 +1,21 @@
-lazy val root = project.in(file("."))
+lazy val root = project
+  .in(file("."))
   .settings(
     name := "scalacheck-schema",
     version := "0.1.0",
     organization := "com.snowplowanalytics",
     description := "ScalaCheck generators for various Iglu-compatible Schema formats",
     scalaVersion := "2.12.13",
-    licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0"))
+    licenses += ("Apache-2.0", url(
+      "https://www.apache.org/licenses/LICENSE-2.0"
+    ))
   )
   .settings(BuildSettings.publishSettings)
   .settings(
     resolvers ++= Seq(
-      "Snowplow bintray" at "https://snowplow.bintray.com/snowplow-maven",
-      "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
+      "Snowplow bintray".at("https://snowplow.bintray.com/snowplow-maven"),
+      "Sonatype OSS Snapshots"
+        .at("https://oss.sonatype.org/content/repositories/snapshots/")
     ),
     libraryDependencies ++= Seq(
       Dependencies.igluClient,
@@ -26,4 +30,3 @@ lazy val root = project.in(file("."))
     )
   )
   .settings(BuildSettings.helpersSettings)
-

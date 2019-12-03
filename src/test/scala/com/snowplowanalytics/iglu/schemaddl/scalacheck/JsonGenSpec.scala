@@ -19,7 +19,8 @@ import io.circe.literal._
 import org.scalacheck.Arbitrary
 import org.specs2.{ScalaCheck, Specification}
 
-class JsonGenSpec extends Specification with ScalaCheck { def is = s2"""
+class JsonGenSpec extends Specification with ScalaCheck {
+  def is = s2"""
   int builds valid integer with minimum $e1
   int builds valid integer with minimum and maximum $e2
   jsonObject builds valid with required keys $e3
@@ -31,13 +32,14 @@ class JsonGenSpec extends Specification with ScalaCheck { def is = s2"""
 
   def e1 = {
     val json = json"""{"type": "integer", "minimum": 10 }"""
-    val input = Schema.parse(json).getOrElse(throw new RuntimeException("Invalid schema"))
+    val input =
+      Schema.parse(json).getOrElse(throw new RuntimeException("Invalid schema"))
 
     implicit val arb: Arbitrary[Json] = Arbitrary(JsonGenSchema.int(input))
 
     val check: Json => Boolean = _.asNumber.flatMap(_.toLong) match {
       case Some(i) => i >= 10
-      case _ => false
+      case _       => false
     }
 
     prop(check)
@@ -45,13 +47,14 @@ class JsonGenSpec extends Specification with ScalaCheck { def is = s2"""
 
   def e2 = {
     val json = json"""{"type": "integer", "minimum": 10, "maximum": 100 }"""
-    val input = Schema.parse(json).getOrElse(throw new RuntimeException("Invalid schema"))
+    val input =
+      Schema.parse(json).getOrElse(throw new RuntimeException("Invalid schema"))
 
     implicit val arb: Arbitrary[Json] = Arbitrary(JsonGenSchema.int(input))
 
     val check: Json => Boolean = _.asNumber.flatMap(_.toInt) match {
       case Some(i) => i >= 10 && i <= 100
-      case _ => false
+      case _       => false
     }
 
     prop(check)
@@ -74,13 +77,16 @@ class JsonGenSpec extends Specification with ScalaCheck { def is = s2"""
       "additionalProperties": true
     }"""
 
-    val input = Schema.parse(json).getOrElse(throw new RuntimeException("Invalid schema"))
+    val input =
+      Schema.parse(json).getOrElse(throw new RuntimeException("Invalid schema"))
 
-    implicit val arb: Arbitrary[Json] = Arbitrary(JsonGenSchema.jsonObject(input))
+    implicit val arb: Arbitrary[Json] = Arbitrary(
+      JsonGenSchema.jsonObject(input)
+    )
 
     val check: Json => Boolean = _.asObject.map(_.keys) match {
       case Some(keys) if keys.toList.contains("foo") => true
-      case _ => false
+      case _                                         => false
     }
 
     prop(check)
@@ -88,7 +94,8 @@ class JsonGenSpec extends Specification with ScalaCheck { def is = s2"""
 
   def e4 = {
     val json = json"""{ "enum": ["one", 2, [], false] }"""
-    val input = Schema.parse(json).getOrElse(throw new RuntimeException("Invalid schema"))
+    val input =
+      Schema.parse(json).getOrElse(throw new RuntimeException("Invalid schema"))
 
     implicit val arb: Arbitrary[Json] = Arbitrary(JsonGenSchema.json(input))
 
@@ -115,7 +122,8 @@ class JsonGenSpec extends Specification with ScalaCheck { def is = s2"""
         "required": [ "json" ]
       }
     ]}"""
-    val input = Schema.parse(json).getOrElse(throw new RuntimeException("Invalid schema"))
+    val input =
+      Schema.parse(json).getOrElse(throw new RuntimeException("Invalid schema"))
 
     val check: Json => Boolean = _.asObject.map(_.keys.toList) match {
       case Some(List("pojo")) | Some(List("json")) => true
@@ -143,23 +151,30 @@ class JsonGenSpec extends Specification with ScalaCheck { def is = s2"""
   }
 
   def e7 = {
-    val d = JsonGenSpec.depth(0)(_)
+    val d  = JsonGenSpec.depth(0)(_)
     val d0 = json"1"
     val d1 = json"""{"foo": "1"}"""
     val d2 = json"""{"foo": {"bar": 1}}"""
     val d3 = json"""{"foo": {"bar": {"bar": 1}}}"""
 
-    (d(d0) must beEqualTo(0)) and (d(d1) must beEqualTo(1)) and (d(d2) must beEqualTo(2)) and (d(d3) must beEqualTo(3))
+    (d(d0) must beEqualTo(0))
+      .and(d(d1) must beEqualTo(1))
+      .and(d(d2) must beEqualTo(2))
+      .and(d(d3) must beEqualTo(3))
   }
 }
 
 object JsonGenSpec {
   def safeMax(default: Int)(list: List[Int]): Int =
-    try { list.max } catch { case _: UnsupportedOperationException => default }
+    try {
+      list.max
+    } catch { case _: UnsupportedOperationException => default }
 
   def depth(i: Int)(json: Json): Int = {
     val go = depth(i + 1)(_)
-    json.asObject.map(obj => safeMax(i) { obj.values.toList.map(go) })
+    json
+      .asObject
+      .map(obj => safeMax(i) { obj.values.toList.map(go) })
       .orElse(json.asArray.map(js => safeMax(i) { js.toList.map(go) }))
       .getOrElse(i)
   }

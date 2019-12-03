@@ -16,11 +16,11 @@ object Dependencies {
 
   object V {
     // Scala
-    val igluClient       = "1.0.2"
-    val schemaDdl        = "0.12.0"
-    val circe            = "0.13.0"
-    val scalaCheck       = "1.15.3"
-    val scalaCheckCats   = "0.3.0"
+    val igluClient     = "1.0.2"
+    val schemaDdl      = "0.12.0"
+    val circe          = "0.13.0"
+    val scalaCheck     = "1.15.3"
+    val scalaCheckCats = "0.3.0"
     // Scala (test only)
     val slf4j     = "1.7.30"
     val validator = "1.6"
@@ -28,11 +28,11 @@ object Dependencies {
   }
 
   // Scala
-  val igluClient       = "com.snowplowanalytics"      %% "iglu-scala-client"         % V.igluClient
-  val circeLiteral     = "io.circe"                   %% "circe-literal"             % V.circe
-  val schemaDdl        = "com.snowplowanalytics"      %% "schema-ddl"                % V.schemaDdl
-  val scalaCheck       = "org.scalacheck"             %% "scalacheck"                % V.scalaCheck
-  val scalaCheckCats   = "io.chrisdavenport"          %% "cats-scalacheck"           % V.scalaCheckCats
+  val igluClient     = "com.snowplowanalytics" %% "iglu-scala-client" % V.igluClient
+  val circeLiteral   = "io.circe"              %% "circe-literal"     % V.circe
+  val schemaDdl      = "com.snowplowanalytics" %% "schema-ddl"        % V.schemaDdl
+  val scalaCheck     = "org.scalacheck"        %% "scalacheck"        % V.scalaCheck
+  val scalaCheckCats = "io.chrisdavenport"     %% "cats-scalacheck"   % V.scalaCheckCats
   // Scala (test only)
   val logger           = "org.slf4j"         % "slf4j-simple"       % V.slf4j     % Test
   val validator        = "commons-validator" % "commons-validator"  % V.validator % Test

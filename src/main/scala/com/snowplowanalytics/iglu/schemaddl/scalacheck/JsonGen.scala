@@ -19,9 +19,31 @@ import org.scalacheck.{Arbitrary, Gen}
 object JsonGen {
 
   /** Restricted set of keys for Object-generator in order to repeat same key in multiple instances */
-  val jsonObjectKeys = List("one", "type", "property", "geo", "position", "currency", "кирилица",
-  "foo", "with space", "camelCase", "PascalCase", "snake_case", "random", "key", "0", "o", "data",
-  "schema", "name", "vendor", "privateIp", "version", "region")
+  val jsonObjectKeys = List(
+    "one",
+    "type",
+    "property",
+    "geo",
+    "position",
+    "currency",
+    "кирилица",
+    "foo",
+    "with space",
+    "camelCase",
+    "PascalCase",
+    "snake_case",
+    "random",
+    "key",
+    "0",
+    "o",
+    "data",
+    "schema",
+    "name",
+    "vendor",
+    "privateIp",
+    "version",
+    "region"
+  )
 
   def json: Gen[Json] =
     for {
@@ -29,11 +51,16 @@ object JsonGen {
       value <- json(depth)
     } yield value
 
-
   def json(maxDepth: Int): Gen[Json] =
     for {
       varyDepth <- Gen.chooseNum(0, maxDepth)
-      jsonGen <- if (varyDepth == 0) primitive else Gen.frequency((10, primitive), (2, jsonObject(maxDepth - 1)), (1, array(maxDepth - 1)))
+      jsonGen <- if (varyDepth == 0) primitive
+      else
+        Gen.frequency(
+          (10, primitive),
+          (2, jsonObject(maxDepth - 1)),
+          (1, array(maxDepth - 1))
+        )
     } yield jsonGen
 
   def bool: Gen[Json] =
@@ -58,7 +85,9 @@ object JsonGen {
 
   /** List of JSON keys pairs with specified depth for non-primitive types */
   def fields(depth: Int): Gen[List[(String, Json)]] =
-    Gen.listOf(Gen.oneOf(jsonObjectKeys).flatMap(k => json(depth).map { (k, _) }))
+    Gen.listOf(
+      Gen.oneOf(jsonObjectKeys).flatMap(k => json(depth).map { (k, _) })
+    )
 
   def jsonObject: Gen[Json] =
     fields.map(Json.fromFields)
