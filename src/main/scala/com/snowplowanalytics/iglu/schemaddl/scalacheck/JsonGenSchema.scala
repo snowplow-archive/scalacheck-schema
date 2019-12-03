@@ -66,8 +66,6 @@ object JsonGenSchema {
 
   import Gen.Choose._
   val ArbitraryBigDecimal = BigDecimal(100000)
-  implicit val bigDecimalChoose: Gen.Choose[BigDecimal] =
-    Gen.Choose.xmap[Double, BigDecimal](BigDecimal(_), _.toDouble)
 
   def number(schema: Schema): Gen[Json] = {
     val minimum = schema.minimum.map(_.getAsDecimal).getOrElse(-ArbitraryBigDecimal)
