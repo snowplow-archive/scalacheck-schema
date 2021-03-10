@@ -1,3 +1,9 @@
+Version 0.2.1 (2021-03-10)
+--------------------------
+Fix badges in README (#29)
+Get rid of v-prefix in git tags (#26)
+Extend copyright notice to 2021 (#27)
+
 Version 0.2.0 (2021-03-10)
 --------------------------
 Migrate to Sonatype and Github Actions (#25)
