@@ -26,7 +26,7 @@ object BuildSettings {
     publishArtifact := true,
     publishArtifact in Test := false,
     pomIncludeRepository := { _ => false },
-    // dynverVTagPrefix := false,      // Otherwise git tags required to have v-prefix
+    ThisBuild / dynverVTagPrefix := false,      // Otherwise git tags required to have v-prefix
     homepage := Some(url("http://snowplowanalytics.com")),
     developers := List(
       Developer(
