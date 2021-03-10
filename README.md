@@ -1,5 +1,10 @@
 # ScalaCheck Schema
 
+[![License][license-image]][license]
+[![Release][release-image]][releases]
+[![CI/CD][cicd-image]][cicd]
+
+
 ScalaCheck generators for various Iglu-compatible schema formats.
 
 ## Installation
@@ -58,14 +63,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 
-[vagrant-install]: http://docs.vagrantup.com/v2/installation/index.html
-[virtualbox-install]: https://www.virtualbox.org/wiki/Downloads
-
-[travis]: https://travis-ci.org/snowplow-incubator/scalacheck-schema
-[travis-image]: https://travis-ci.org/snowplow-incubator/scalacheck-schema.png?branch=master
+[cicd]: https://github.com/snowplow-incubator/scalacheck-schema/actions/workflows/release.yml
+[cicd-image]: https://github.com/snowplow-incubator/scalacheck-schema/actions/workflows/release.yml/badge.svg
 
 [license-image]: http://img.shields.io/badge/license-Apache--2-blue.svg?style=flat
 [license]: http://www.apache.org/licenses/LICENSE-2.0
 
-[release-image]: http://img.shields.io/badge/release-0.2.0-blue.svg?style=flat
+[release-image]: https://maven-badges.herokuapp.com/maven-central/com.snowplowanalytics/scalacheck-schema_2.12/badge.svg?style=flat
 [releases]: https://github.com/snowplow-incubator/scalacheck-schema/releases
