@@ -15,6 +15,8 @@
 import sbt._
 import Keys._
 
+import sbtdynver.DynVerPlugin.autoImport._
+
 /**
   * Common settings-patterns for Snowplow apps and libaries.
   * To enable any of these you need to explicitly add Settings value to build.sbt
@@ -24,13 +26,8 @@ object BuildSettings {
     publishArtifact := true,
     publishArtifact in Test := false,
     pomIncludeRepository := { _ => false },
+    ThisBuild / dynverVTagPrefix := false,      // Otherwise git tags required to have v-prefix
     homepage := Some(url("http://snowplowanalytics.com")),
-    scmInfo := Some(
-      ScmInfo(
-        url("https://github.com/snowplow-incubator/scalacheck-schema"),
-        "git@github.com:snowplow-incubator/scalacheck-schema.git"
-      )
-    ),
     developers := List(
       Developer(
         "Snowplow Analytics Ltd",
