@@ -15,6 +15,7 @@
 import sbt._
 import Keys._
 
+import xerial.sbt.Sonatype.SonatypeKeys._
 import sbtdynver.DynVerPlugin.autoImport._
 
 /**
@@ -27,6 +28,7 @@ object BuildSettings {
     publishArtifact in Test := false,
     pomIncludeRepository := { _ => false },
     // dynverVTagPrefix := false,      // Otherwise git tags required to have v-prefix
+    sonatypeBundleDirectory := (ThisBuild / baseDirectory).value / target.value.getName / "sona-staging" / (ThisBuild / version).value,
     homepage := Some(url("http://snowplowanalytics.com")),
     developers := List(
       Developer(
