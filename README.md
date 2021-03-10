@@ -9,12 +9,12 @@ ScalaCheck generators for various Iglu-compatible schema formats.
 
 ## Installation
 
-The latest version of ScalaCheck Schema is 0.2.0, which is built against Scala 2.12.x.
+The latest version of ScalaCheck Schema is 0.2.1, which is built against Scala 2.12.x.
 
 If you're using SBT, add the following lines to your build file:
 
 ```scala
-libraryDependencies += "com.snowplowanalytics" %% "scalacheck-schema" % "0.2.0"
+libraryDependencies += "com.snowplowanalytics" %% "scalacheck-schema" % "0.2.1"
 ```
 
 ## Usage
